@@ -1011,6 +1011,7 @@ add() {
         if [[ $is_use_port ]]; then
             [[ ! $(is_test port ${is_use_port}) ]] && {
                 err "($is_use_port) 不是一个有效的端口. $is_err_tips"
+            }
             [[ $(is_test port_used $is_use_port) ]] && {
                 err "无法使用 ($is_use_port) 端口. $is_err_tips"
             }
@@ -1050,7 +1051,7 @@ add() {
                 for v in ${is_tmp_list[@]}; do
                     msg "\t\t$v"
                 done
-                msg
+                msg "$is_err_tips\n"
                 exit 1
             }
             ss_method=$is_tmp_use_type
