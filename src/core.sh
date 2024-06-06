@@ -1653,6 +1653,7 @@ update() {
 
 # main menu; if no prefer args.
 is_main_menu() {
+    msg ""
     msg "------------- xray -------------"
     msg ""
     msg "$is_core_ver: $is_core_status"
