@@ -40,7 +40,6 @@ show_help() {
             "   new [name] [...]                                更改协议"
             "   web [name] [domain]                             更改伪装网站\n"
             "进阶:"
-            "   dns [...]                                       设置 DNS"
             "   dd, ddel [name...]                              删除多个配置**"
             "   fix [name]                                      修复一个配置"
             "   fix-all                                         修复全部配置"
@@ -69,6 +68,7 @@ show_help() {
         for v in "${help_info[@]}"; do
             msg "$v"
         done
+        msg ""
         ;;
 
     esac
@@ -76,6 +76,6 @@ show_help() {
 
 about() {
     msg
-    msg "网站:https://github.com/xray"
+    msg "https://github.com/xray"
     msg
 }
