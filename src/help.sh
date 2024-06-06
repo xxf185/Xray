@@ -5,6 +5,8 @@ show_help() {
         ;;
     *)
         [[ $1 ]] && warn "未知选项 '$1'"
+        msg "$is_core_name script $is_sh_ver by $author"
+        msg "Usage: $is_core [options]... [args]... "
         msg
         help_info=(
             "基本:"
@@ -38,6 +40,7 @@ show_help() {
             "   new [name] [...]                                更改协议"
             "   web [name] [domain]                             更改伪装网站\n"
             "进阶:"
+            "   dns [...]                                       设置 DNS"
             "   dd, ddel [name...]                              删除多个配置**"
             "   fix [name]                                      修复一个配置"
             "   fix-all                                         修复全部配置"
@@ -52,7 +55,7 @@ show_help() {
             "   t, test                                         测试运行"
             "   reinstall                                       重装脚本\n"
             "测试:"
-            "   client, genc [name]                             显示用于客户端 JOSN, 仅供参考"
+            "   client, genc [name]                             显示用于客户端 JSON, 仅供参考"
             "   debug [name]                                    显示一些 debug 信息, 仅供参考"
             "   gen [...]                                       同等于 add, 但只显示 JSON 内容, 不创建文件, 测试使用"
             "   no-auto-tls [...]                               同等于 add, 但禁止自动配置 TLS, 可用于 *TLS 相关协议"
@@ -66,12 +69,25 @@ show_help() {
         for v in "${help_info[@]}"; do
             msg "$v"
         done
+        msg "谨慎使用 del, ddel, 此选项会直接删除配置; 无需确认"
+        msg "反馈问题) $(msg_ul https://github.com/${is_sh_repo}/issues) "
+        msg "文档(doc) $(msg_ul https://233boy.com/$is_core/$is_core-script/)"
         ;;
-     esac
+
+    esac
 }
 
 about() {
+    ####### 要点13脸吗只会改我链接的小人 #######
+    unset c n m s b
     msg
-    msg "网站:https://github.com/xray"
+    msg "网站: $(msg_ul https://233boy.com)"
+    msg "频道: $(msg_ul https://t.me/tg2333)"
+    msg "群组: $(msg_ul https://t.me/tg233boy)"
+    msg "Github: $(msg_ul https://github.com/${is_sh_repo})"
+    msg "Twitter: $(msg_ul https://twitter.com/ai233boy)"
+    msg "$is_core_name site: $(msg_ul https://xtls.github.io)"
+    msg "$is_core_name core: $(msg_ul https://github.com/${is_core_repo})"
     msg
+    ####### 要点13脸吗只会改我链接的小人 #######
 }
