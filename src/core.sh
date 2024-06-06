@@ -777,6 +777,8 @@ uninstall() {
     fi
     [[ $is_install_sh ]] && return # reinstall
     _green "\n卸载完成!"
+    msg "脚本哪里需要完善? 请反馈"
+    msg "反馈问题) $(msg_ul https://github.com/${is_sh_repo}/issues)\n"
 }
 
 # manage run status
@@ -963,6 +965,7 @@ add() {
         # err msg tips
         is_err_tips="\n\n请使用: $(_green $is_core add $1 $is_add_opts) 来添加 $is_new_protocol 配置"
     }
+
     # remove old protocol args
     if [[ $is_set_new_protocol ]]; then
         case $is_old_net in
@@ -1073,7 +1076,7 @@ add() {
             # test auto tls
             [[ $(is_test port_used 80) || $(is_test port_used 443) ]] && {
                 warn "端口 (80 或 443) 已经被占用, 无法完成自动配置 TLS. 请考虑使用 no-auto-tls"
-                msg
+                msg "\e[41m帮助(help)\e[0m: $(msg_ul https://233boy.com/$is_core/no-auto-tls/)\n"
                 exit 1
             }
             is_install_caddy=1
@@ -1465,7 +1468,7 @@ info() {
     tcp | kcp | quic)
         is_can_change=(0 1 5 7)
         is_info_show=(0 1 2 3 4 5)
-        is_vmess_url=$(jq -c '{v:2,ps:'\"${net}-$is_addr\"',add:'\"$is_addr\"',port:'\"$port\"',id:'\"$uuid\"',aid:"0",net:'\"$net\"',type:'\"$header_type\"',path:'\"$kcp_seed\"'}' <<<{})
+        is_vmess_url=$(jq -c '{v:2,ps:'\"233boy-${net}-$is_addr\"',add:'\"$is_addr\"',port:'\"$port\"',id:'\"$uuid\"',aid:"0",net:'\"$net\"',type:'\"$header_type\"',path:'\"$kcp_seed\"'}' <<<{})
         is_url=vmess://$(echo -n $is_vmess_url | base64 -w 0)
         is_tmp_port=$port
         [[ $is_dynamic_port ]] && {
@@ -1481,7 +1484,7 @@ info() {
     ss)
         is_can_change=(0 1 4 6)
         is_info_show=(0 1 2 10 11)
-        is_url="ss://$(echo -n ${ss_method}:${ss_password} | base64 -w 0)@${is_addr}:${port}#$net-${is_addr}"
+        is_url="ss://$(echo -n ${ss_method}:${ss_password} | base64 -w 0)@${is_addr}:${port}#233boy-$net-${is_addr}"
         is_info_str=($is_protocol $is_addr $port $ss_password $ss_method)
         ;;
     ws | h2 | grpc)
@@ -1494,7 +1497,7 @@ info() {
             is_url_path=serviceName
         }
         [[ $is_protocol == 'vmess' ]] && {
-            is_vmess_url=$(jq -c '{v:2,ps:'\"$net-$host\"',add:'\"$is_addr\"',port:'\"$tlsport\"',id:'\"$uuid\"',aid:"0",net:'\"$net\"',host:'\"$host\"',path:'\"$path\"',tls:'\"tls\"'}' <<<{})
+            is_vmess_url=$(jq -c '{v:2,ps:'\"233boy-$net-$host\"',add:'\"$is_addr\"',port:'\"$tlsport\"',id:'\"$uuid\"',aid:"0",net:'\"$net\"',host:'\"$host\"',path:'\"$path\"',tls:'\"tls\"'}' <<<{})
             is_url=vmess://$(echo -n $is_vmess_url | base64 -w 0)
         } || {
             [[ $is_trojan ]] && {
@@ -1503,7 +1506,7 @@ info() {
                 is_can_change=(0 1 2 3 4)
                 is_info_show=(0 1 2 10 4 6 7 8)
             }
-            is_url="$is_protocol://$uuid@$host:$tlsport?encryption=none&security=tls&type=$net&host=$host&${is_url_path}=$(sed 's#/#%2F#g' <<<$path)#$net-$host"
+            is_url="$is_protocol://$uuid@$host:$tlsport?encryption=none&security=tls&type=$net&host=$host&${is_url_path}=$(sed 's#/#%2F#g' <<<$path)#233boy-$net-$host"
         }
         [[ $is_caddy ]] && is_can_change+=(13)
         is_info_str=($is_protocol $is_addr $tlsport $uuid $net $host $path 'tls')
@@ -1513,7 +1516,7 @@ info() {
         is_can_change=(0 1 5 10 11)
         is_info_show=(0 1 2 3 15 8 16 17 18)
         is_info_str=($is_protocol $is_addr $port $uuid xtls-rprx-vision reality $is_servername "ios" $is_public_key)
-        is_url="$is_protocol://$uuid@$ip:$port?encryption=none&security=reality&flow=xtls-rprx-vision&type=tcp&sni=$is_servername&pbk=$is_public_key&fp=ios#$net-$is_addr"
+        is_url="$is_protocol://$uuid@$ip:$port?encryption=none&security=reality&flow=xtls-rprx-vision&type=tcp&sni=$is_servername&pbk=$is_public_key&fp=ios#233boy-$net-$is_addr"
         ;;
     door)
         is_can_change=(0 1 8 9)
@@ -1524,7 +1527,7 @@ info() {
         is_can_change=(0 1 15 4)
         is_info_show=(0 1 2 19 10)
         is_info_str=($is_protocol $is_addr $port $is_socks_user $is_socks_pass)
-        is_url="socks://$(echo -n ${is_socks_user}:${is_socks_pass} | base64 -w 0)@${is_addr}:${port}#$net-${is_addr}"
+        is_url="socks://$(echo -n ${is_socks_user}:${is_socks_pass} | base64 -w 0)@${is_addr}:${port}#233boy-$net-${is_addr}"
         ;;
     http)
         is_can_change=(0 1)
@@ -1553,7 +1556,7 @@ info() {
         msg "------------- no-auto-tls INFO -------------"
         msg "端口(port): $port"
         msg "路径(path): $is_tmp_path"
-        msg 
+        msg "\e[41m帮助(help)\e[0m: $(msg_ul https://233boy.com/$is_core/no-auto-tls/)"
     fi
     footer_msg
 }
@@ -1562,9 +1565,13 @@ info() {
 footer_msg() {
     [[ $is_core_stop && ! $is_new_json ]] && warn "$is_core_name 当前处于停止状态."
     [[ $is_caddy_stop && $host ]] && warn "Caddy 当前处于停止状态."
-    msg
-    msg "------------- 结束 -------------"
-    msg
+    ####### 要点13脸吗只会改我链接的小人 #######
+    unset c n m s b
+    msg "------------- END -------------"
+    msg "关注(tg): $(msg_ul https://t.me/tg2333)"
+    msg "文档(doc): $(msg_ul https://233boy.com/$is_core/$is_core-script/)"
+    msg "推广(ads): 机场推荐($is_core_name services): $(msg_ul https://g${c}e${n}t${m}j${s}m${b}s.com/)\n"
+    ####### 要点13脸吗只会改我链接的小人 #######
 }
 
 # URL or qrcode
@@ -1650,10 +1657,9 @@ update() {
 
 # main menu; if no prefer args.
 is_main_menu() {
-    msg "\n------------- xray -------------"
-    msg 
+    msg "\n------------- $is_core_name script $is_sh_ver by $author -------------"
     msg "$is_core_ver: $is_core_status"
-    msg 
+    msg "群组(Chat): $(msg_ul https://t.me/tg233boy)"
     is_main_start=1
     ask mainmenu
     case $REPLY in
@@ -1689,7 +1695,7 @@ is_main_menu() {
         show_help
         ;;
     9)
-        ask list is_do_other "启用BBR 查看日志 查看错误日志 测试运行 重装脚本"
+        ask list is_do_other "启用BBR 查看日志 查看错误日志 测试运行 重装脚本 设置DNS"
         case $REPLY in
         1)
             load bbr.sh
@@ -1706,6 +1712,10 @@ is_main_menu() {
             ;;
         5)
             get reinstall
+            ;;
+        6)
+            load dns.sh
+            dns_set
             ;;
         esac
         ;;
@@ -1779,6 +1789,10 @@ main() {
         is_dont_auto_exit=
         [[ $is_api_fail ]] && manage restart &
         [[ $is_del_host ]] && manage restart caddy &
+        ;;
+    dns)
+        load dns.sh
+        dns_set ${@:2}
         ;;
     debug)
         is_debug=1
