@@ -93,7 +93,6 @@ change_list=(
 servername_list=(
     www.amazon.com
     www.ebay.com
-    one-piece.com
     www.cloudflare.com
     dash.cloudflare.com
     aws.amazon.com
