@@ -1554,7 +1554,7 @@ info() {
         msg "$a $tt= \e[${is_color}m${is_info_str[$i]}\e[0m"
     done
     if [[ $is_new_install ]]; then
-        warn ""
+        msg ""
     fi
     if [[ $is_url ]]; then
         msg "------------- ${info_list[12]} -------------"
