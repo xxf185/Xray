@@ -1489,7 +1489,7 @@ info() {
         }
         is_info_str=($is_protocol $is_addr "$is_tmp_port" $uuid $net $header_type $kcp_seed)
         if [[ $is_reality ]]; then
-            is_color=45
+            is_color=44
             is_can_change=(0 1 5 10 11)
             is_info_show=(0 1 2 3 15 8 16 17 18)
             is_info_str=($is_protocol $is_addr $port $uuid xtls-rprx-vision reality $is_servername "chrome" $is_public_key)
