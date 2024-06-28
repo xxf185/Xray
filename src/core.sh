@@ -1503,7 +1503,7 @@ info() {
         is_info_str=($is_protocol $is_addr $port $ss_password $ss_method)
         ;;
     ws | h2 | grpc | splithttp)
-        is_color=45
+        is_color=44
         is_can_change=(0 1 2 3 5)
         is_info_show=(0 1 2 3 4 6 7 8)
         is_url_path=path
