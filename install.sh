@@ -309,7 +309,7 @@ main() {
     # show welcome msg
     clear
     echo
-    echo "........... $is_core_name script by $author .........."
+    echo "........... xray .........."
     echo
 
     # start installing...
