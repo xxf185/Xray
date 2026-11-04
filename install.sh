@@ -1,7 +1,7 @@
 #!/bin/bash
 
-author=xxf185
-# github=https://github.com/xxf185/xray
+author=233boy
+# github=https://github.com/233boy/xray
 
 # bash fonts colors
 red='\e[31m'
@@ -34,14 +34,24 @@ warn() {
 # root
 [[ $EUID != 0 ]] && err "当前非 ${yellow}ROOT用户.${none}"
 
-# yum or apt-get, ubuntu/debian/centos
-cmd=$(type -P apt-get || type -P yum)
-[[ ! $cmd ]] && err "此脚本仅支持 ${yellow}(Ubuntu or Debian or CentOS)${none}."
+# yum or apt-get or apk, ubuntu/debian/centos/alpine
+cmd=$(type -P apt-get || type -P yum || type -P apk)
+[[ ! $cmd ]] && err "此脚本仅支持 ${yellow}(Ubuntu or Debian or CentOS or Alpine)${none}."
 
-# systemd
-[[ ! $(type -P systemctl) ]] && {
-    err "此系统缺少 ${yellow}(systemctl)${none}, 请尝试执行:${yellow} ${cmd} update -y;${cmd} install systemd -y ${none}来修复此错误."
-}
+# alpine linux
+is_alpine=
+[[ $cmd =~ apk ]] && is_alpine=1
+
+# systemd or openrc
+if [[ $is_alpine ]]; then
+    [[ ! $(type -P rc-service) ]] && {
+        err "此系统缺少 ${yellow}(rc-service)${none}, 请尝试执行:${yellow} ${cmd} add openrc ${none}来修复此错误."
+    }
+else
+    [[ ! $(type -P systemctl) ]] && {
+        err "此系统缺少 ${yellow}(systemctl)${none}, 请尝试执行:${yellow} ${cmd} update -y;${cmd} install systemd -y ${none}来修复此错误."
+    }
+fi
 
 # wget installed or none
 is_wget=$(type -P wget)
@@ -65,7 +75,7 @@ is_core=xray
 is_core_name=Xray
 is_core_dir=/etc/$is_core
 is_core_bin=$is_core_dir/bin/$is_core
-is_core_repo=xxf185/$is_core-core
+is_core_repo=xtls/$is_core-core
 is_conf_dir=$is_core_dir/conf
 is_log_dir=/var/log/$is_core
 is_sh_bin=/usr/local/bin/$is_core
@@ -143,11 +153,20 @@ install_pkg() {
     if [[ $cmd_not_found ]]; then
         pkg=$(echo $cmd_not_found | sed 's/,/ /g')
         msg warn "安装依赖包 >${pkg}"
-        $cmd install -y $pkg &>/dev/null
+        if [[ $is_alpine ]]; then
+            $cmd add $pkg &>/dev/null
+        else
+            $cmd install -y $pkg &>/dev/null
+        fi
         if [[ $? != 0 ]]; then
             [[ $cmd =~ yum ]] && yum install epel-release -y &>/dev/null
-            $cmd update -y &>/dev/null
-            $cmd install -y $pkg &>/dev/null
+            if [[ $is_alpine ]]; then
+                $cmd update &>/dev/null
+                $cmd add $pkg &>/dev/null
+            else
+                $cmd update -y &>/dev/null
+                $cmd install -y $pkg &>/dev/null
+            fi
             [[ $? == 0 ]] && >$is_pkg_ok
         else
             >$is_pkg_ok
@@ -174,7 +193,7 @@ download() {
         is_ok=$is_sh_ok
         ;;
     jq)
-        link=https://github.com/xxf185/jq/releases/latest/download/jq-linux-$is_jq_arch
+        link=https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-$is_jq_arch
         name="jq"
         tmpfile=$tmpjq
         is_ok=$is_jq_ok
@@ -198,7 +217,7 @@ check_status() {
     # dependent pkg install fail
     [[ ! -f $is_pkg_ok ]] && {
         msg err "安装依赖包失败"
-        msg err "请尝试手动安装依赖包: $cmd update -y; $cmd install -y $pkg"
+        msg err "请尝试手动安装依赖包: $cmd update -y; $cmd install -y $is_pkg"
         is_fail=1
     }
 
@@ -288,7 +307,7 @@ exit_and_del_tmpdir() {
     [[ ! $1 ]] && {
         msg err "哦豁.."
         msg err "安装过程出现错误..."
-        echo -e ""
+        echo -e "反馈问题) https://github.com/${is_sh_repo}/issues"
         echo
         exit 1
     }
@@ -309,7 +328,7 @@ main() {
     # show welcome msg
     clear
     echo
-    echo "........... xray .........."
+    echo "........... $is_core_name script by $author .........."
     echo
 
     # start installing...
@@ -331,7 +350,12 @@ main() {
 
     timedatectl set-ntp true &>/dev/null
     [[ $? != 0 ]] && {
-        msg warn "${yellow}\e[4m提醒!!! 无法设置自动同步时间, 可能会影响使用 VMess 协议.${none}"
+        [[ $is_alpine ]] || msg warn "${yellow}\e[4m提醒!!! 无法设置自动同步时间, 可能会影响使用 VMess 协议.${none}"
+    }
+    # alpine 默认无 timedatectl, 尝试用 chronyd / ntpd 替代
+    [[ $is_alpine ]] && {
+        rc-service chronyd start &>/dev/null || rc-service ntpd start &>/dev/null || \
+            msg warn "${yellow}\e[4m提醒!!! 无法设置自动同步时间, 可能会影响使用 VMess 协议.${none}"
     }
 
     # install dependent pkg
@@ -425,8 +449,8 @@ main() {
     mkdir -p $is_conf_dir
 
     load core.sh
-    # create a tcp config
-    add reality
+    # create a config
+    add hy2
     # remove tmp dir and exit.
     exit_and_del_tmpdir ok
 }
